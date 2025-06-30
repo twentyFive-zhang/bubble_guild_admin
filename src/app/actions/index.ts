@@ -8,37 +8,53 @@ async function request(url: string, body?: Record<string, unknown>) {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
   console.log(token);
-
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API}/guild-admin${url}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Token: token as unknown as string,
-    },
-    credentials: "include",
-    cache: "no-cache",
-    body: JSON.stringify(body || {}),
-  });
-  const resData = await res.json();
-  console.log(resData);
-  // GET(resData);
-  if (resData.code === 401) {
-    redirect("/");
-    return resData;
-  }
-  if (resData.code === 200) {
-    if (url === "/login") {
-      cookieStore.set("token", resData.data.token);
-      redirect("/");
-    }
-    if (url === "logout") {
-      cookieStore.delete("token");
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API}/guild-admin${url}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Token: token as unknown as string,
+      },
+      credentials: "include",
+      cache: "no-cache",
+      body: JSON.stringify(body || {}),
+    });
+    const resData = await res.json();
+    console.log(resData);
+    // GET(resData);
+    if (resData.code === 401) {
+      // cookieStore.delete("token");
       redirect("/sign-in");
+      // return resData;
     }
-    return resData;
-  }
+    if (resData.code === 200) {
+      if (url === "/login") {
+        cookieStore.set("token", resData.data.token);
+        redirect("/");
+      }
+      if (url === "logout") {
+        cookieStore.delete("token");
+      }
+      if (typeof resData.data?.pageNum === "number") {
+        return {
+          code: resData.code,
+          message: resData.message,
+          data: {
+            list: resData.data?.list || [],
+            pageNum: resData.data?.pageNum,
+            pageSize: resData.data?.pageSize,
+            total: resData.data?.total,
+          },
+        };
+      }
+      return resData;
+    }
 
-  return resData;
+    return resData;
+  } catch (e) {
+    console.log(e);
+    return {};
+  }
 }
 
 export async function getVerifyCode(data: { phone: string }) {
@@ -131,4 +147,68 @@ export async function getLeavePage(
   }>
 ) {
   return request("/guild-member/leave-page", data);
+}
+
+export async function getLogPage(
+  data: PageParams<{
+    // 操作类型
+    urlName: string;
+    // 用户编码
+    userCode: string;
+  }>
+): Promise<
+  API.ResponseModel<
+    API.PageModel<{
+      // 被操作用户ID
+      userId: number;
+      // 被操作用户编码
+      userCode: string;
+      // 被操作用户昵称
+      nickname: string;
+      // 操作用户编码
+      operateUserCode: string;
+      // 操作用户昵称
+      operateNickname: string;
+      // 操作类型
+      urlName: string;
+      // 操作时间
+      createTimeStr: string;
+    }>
+  >
+> {
+  return request("/log/page", data);
+}
+
+export async function getMemberListPage(
+  data: PageParams<{
+    // 角色: 2-管理 10-普通成员
+    guildUserRole: string;
+    // 用户编码
+    userCode: string;
+  }>
+): Promise<
+  API.ResponseModel<
+    API.PageModel<{
+      // 用户ID: 后续调用接口用这个字段
+      userId: number;
+      // 用户编码：页面显示用这个字段
+      userCode: string;
+      // 用户昵称
+      nickname: string;
+      // 角色
+      userRole: number;
+      // 角色名称
+      userRoleName: string;
+    }>
+  >
+> {
+  return request("/guild-manager/member-page", data);
+}
+
+export async function setMemberRole({ userId, status }: { userId: number; status: 0 | 1 }) {
+  return request(`/guild-manager/update-manager/${userId}/${status}`);
+}
+
+export async function getFindStat({ timeType }: { timeType: number }) {
+  return request(`/guild/find-stat/${timeType}`);
 }

@@ -1,13 +1,14 @@
 declare namespace API {
-  type PageParams = {
+  type PageParams<T = unknown> = {
     pageSize: number;
     pageNum: number;
-  };
+  } & T;
   type PageIndexModel = {
     pageNum: number;
     pageSize: number;
     total: number;
   };
+
   type PageModel<T = unknown> = {
     list: T[];
   } & PageIndexModel;

@@ -4,10 +4,10 @@ import { redirect } from "next/navigation";
 export default async function Home() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
-  console.log({ token });
-  // if (token) {
-  //   redirect("/dashboard");
-  // } else {
-  //   redirect("/sign-in");
-  // }
+  // console.log({ token });
+  if (token) {
+    redirect("/dashboard");
+  } else {
+    redirect("/sign-in");
+  }
 }

@@ -20,37 +20,6 @@ import {
 
 export const description = "An area chart with axes";
 
-const chartData = [
-  {
-    time: "20250615",
-    value: 0,
-  },
-  {
-    time: "20250616",
-    value: 0,
-  },
-  {
-    time: "20250617",
-    value: 20000,
-  },
-  {
-    time: "20250618",
-    value: 0,
-  },
-  {
-    time: "20250619",
-    value: 0,
-  },
-  {
-    time: "20250620",
-    value: 32,
-  },
-  {
-    time: "20250621",
-    value: 0,
-  },
-];
-
 const chartConfig = {
   desktop: {
     label: "Desktop",
@@ -62,7 +31,8 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function ChartAreaAxes() {
+export function ChartAreaAxes({ list }: { list: { time: string; value: number }[] }) {
+  // console.log(data.lastSevenDaysTurnoverList);
   return (
     <Card className="border-none shadow-none">
       <CardHeader>
@@ -72,7 +42,7 @@ export function ChartAreaAxes() {
       </CardHeader>
       <CardContent>
         <ChartContainer className="h-60 w-full" config={chartConfig}>
-          <AreaChart accessibilityLayer data={chartData}>
+          <AreaChart accessibilityLayer data={list}>
             <CartesianGrid vertical={false} />
             <XAxis dataKey="time" tickLine={false} axisLine={false} />
             <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={3} />

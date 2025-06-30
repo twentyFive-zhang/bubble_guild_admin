@@ -4,88 +4,24 @@ import { Segmented, Table } from "antd";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const data = {
-  // 公会ID
-  guildId: 3,
-  // 公会编码：页面上显示这个字段
-  guildCode: "9365238",
-  // 公会名称
-  guildName: "测试三号公会",
-  // 公会图标
-  guildIcon:
-    "https://dimengbubble-test.oss-cn-shenzhen.aliyuncs.com/5da513ba89fe451da4172d29681725c3.jpg",
-  // 申请加入公会用户数量
-  applyJoinUsers: 0,
-  // 申请退出公会用户数量
-  applyLeaveUsers: 0,
-  // 今日流水
-  todayTurnover: 0,
-  // 本周流水
-  thisWeekTurnover: 0,
-  // 本月流水
-  thisMonthTurnover: 0,
-  // 成员数量
-  members: 1,
-  // 今日上线成员数量
-  todayActiveUsers: 0,
-  // 今日获得收益成员数量
-  todayIncomeUsers: 0,
-  // 今日获得收益成员数量相较昨日增长百分比
-  todayIncomeUserIncrease: "0%",
-  // 近7日流水
-  lastSevenDaysTurnoverList: [
-    {
-      // 时间
-      time: "20250611",
-      // 流水
-      value: 0,
-    },
-    {
-      time: "20250612",
-      value: 0,
-    },
-    {
-      time: "20250613",
-      value: 0,
-    },
-    {
-      time: "20250614",
-      value: 0,
-    },
-    {
-      time: "20250615",
-      value: 0,
-    },
-    {
-      time: "20250616",
-      value: 0,
-    },
-    {
-      time: "20250617",
-      value: 0,
-    },
-  ],
-  // 今日用户流水排名
-  todayUserTurnoverRankList: [
-    {
-      rank: 1,
-      userCode: "778844556",
-      nickname: "念你如初",
-      value: 789,
-    },
-  ],
-  // 今日房间流水排名
-  todayRoomTurnoverRankList: [
-    {
-      rank: 1,
-      roomNo: "556677",
-      roomName: "念你如初新厅开业",
-      value: 7000,
-    },
-  ],
-};
-
-export const RankList = () => {
+export const RankList = ({
+  data,
+}: {
+  data?: {
+    todayRoomTurnoverRankList: {
+      rank: number;
+      roomNo: string;
+      roomName: string;
+      value: number;
+    }[];
+    todayUserTurnoverRankList: {
+      rank: number;
+      userCode: string;
+      nickname: string;
+      value: number;
+    }[];
+  };
+}) => {
   const [type, setType] = useState("user");
 
   return (
@@ -112,7 +48,7 @@ export const RankList = () => {
                 { dataIndex: "userCode", title: "ID" },
                 { dataIndex: "value", title: "今日流水" },
               ],
-              dataSource: data.todayUserTurnoverRankList,
+              dataSource: data?.todayUserTurnoverRankList || [],
             }
           : {
               columns: [
@@ -121,13 +57,17 @@ export const RankList = () => {
                 { dataIndex: "roomNo", title: "ID" },
                 { dataIndex: "value", title: "今日流水" },
               ],
-              dataSource: data.todayRoomTurnoverRankList,
+              dataSource: data?.todayRoomTurnoverRankList || [],
             })}></Table>
     </div>
   );
 };
 
-export const ApplyCard = () => {
+export const ApplyCard = ({
+  data,
+}: {
+  data: { applyJoinUsers: number; applyLeaveUsers: number };
+}) => {
   const router = useRouter();
   return (
     <div className="grid grid-cols-2 h-30 items-center">
@@ -137,7 +77,7 @@ export const ApplyCard = () => {
           router.push("/sign/apply");
         }}>
         <div className="text-base ">待审核加入成员</div>
-        <div className="text-lg font-bold mt-4">{data.applyJoinUsers}</div>
+        <div className="text-lg font-bold mt-4">{data?.applyJoinUsers || 0}</div>
       </div>
       <div
         className="text-center  cursor-pointer"
@@ -145,7 +85,7 @@ export const ApplyCard = () => {
           router.push("/sign/remove");
         }}>
         <div className="text-base ">待审核退出成员</div>
-        <div className="text-lg font-bold mt-4">{data.applyJoinUsers}</div>
+        <div className="text-lg font-bold mt-4">{data?.applyLeaveUsers || 0}</div>
       </div>
     </div>
   );

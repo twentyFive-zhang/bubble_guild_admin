@@ -2,7 +2,7 @@
 
 import { logout } from "@/app/actions";
 import { Avatar, Button, Flex, Popover } from "antd";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 const data = {
   // token，后续请求的时候，需要在请求头上加Token: 6834a4254791431fb9eb4b8374301cd3#1#3
@@ -39,7 +39,7 @@ export const UserAvatar = () => {
         <Button
           type="text"
           onClick={() => {
-            // logout();
+            logout();
             router.replace("/sign-in");
           }}>
           退出登录
