@@ -75,20 +75,25 @@ export const routes = [
   },
 ];
 
-export const routeMap: Record<string, string> = {};
+export const routeMap: Record<string, { title: string; href: string; children?: IRoute[] }[]> = {};
 
-const flatRoutesToMenuList = (routes: IRoute[], key?: string): ItemType[] => {
+const flatRoutesToMenuList = (routes: IRoute[], key?: string, routeList?: IRoute[]): ItemType[] => {
   return routes.map((item) => {
     const { title, href, children } = item;
     if (!children?.length) {
-      routeMap[`${key || ""}${href}`] = title;
+      routeMap[`${key || ""}${href}`] = [...(routeList || []), item];
     }
     return {
       label: title,
       title,
       key: `${key || ""}${href}`,
       ...(children?.length
-        ? { children: flatRoutesToMenuList(children, `${key || ""}${href}`) }
+        ? {
+            children: flatRoutesToMenuList(children, `${key || ""}${href}`, [
+              ...(routeList || []),
+              item,
+            ]),
+          }
         : {}),
     };
   });

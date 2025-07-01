@@ -45,9 +45,13 @@ export default function LoginForm() {
       form={form}
       onFinish={(values) => {
         setLoading(true);
-        login(values).finally(() => {
-          setLoading(false);
-        });
+        login(values)
+          .then((res) => {
+            console.log({ res });
+          })
+          .finally(() => {
+            setLoading(false);
+          });
       }}>
       <FormItem name="phone" rules={[{ required: true, message: "Please input your phone!" }]}>
         <Input prefix={<UserOutlined />} placeholder="Phone" />

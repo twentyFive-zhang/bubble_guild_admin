@@ -24,16 +24,13 @@ async function request(url: string, body?: Record<string, unknown>) {
     console.log(resData);
     // GET(resData);
     if (resData.code === 401) {
-      // cookieStore.delete("token");
-      // redirect("/sign-in");
       redirectPath = "/sign-in";
       // return resData;
     }
     if (resData.code === 200) {
       if (url === "/login") {
         cookieStore.set("token", resData.data.token);
-        // redirect("/");
-        redirectPath = "/";
+        // redirectPath = "/";
       }
       if (url === "logout") {
         cookieStore.delete("token");
@@ -107,22 +104,48 @@ export async function getJoinPage(
     userCode: string;
   }>
 ): Promise<
-  API.PageModel<{
-    // 提交审核的时候用这个字段
-    id: number;
-    // 用户编码
-    userCode: string;
-    // 昵称
-    nickname: string;
-    // 申请时间
-    applyTimeStr: string;
-    // 审核状态：1-待审核 其他的都是已处理，其他的具体状态见下面的auditStatusName
-    auditStatus: number;
-    // 审核状态名称
-    auditStatusName: string;
-  }>
+  API.ResponseModel<
+    API.PageModel<{
+      // 提交审核的时候用这个字段
+      id: number;
+      // 用户编码
+      userCode: string;
+      // 昵称
+      nickname: string;
+      // 申请时间
+      applyTimeStr: string;
+      // 审核状态：1-待审核 其他的都是已处理，其他的具体状态见下面的auditStatusName
+      auditStatus: number;
+      // 审核状态名称
+      auditStatusName: string;
+    }>
+  >
 > {
   return request("/guild-member/join-page", data);
+}
+
+export async function getPunishPage(
+  data: PageParams<{
+    // 开始时间：yyyyMMddHHmmss 例如202510618121212
+    punishTimeStart: string;
+    // 结束时间：yyyyMMddHHmmss 例如202510618121212
+    punishTimeEnd: string;
+    userCode: string;
+  }>
+): Promise<
+  API.ResponseModel<
+    API.PageModel<{
+      id: number;
+      userCode: string;
+      nickname: string;
+      joinTimeStr: string;
+      reasonContent: string;
+      violationsTimes: number;
+      punishName: string;
+    }>
+  >
+> {
+  return request("/guild-member/punish-page", data);
 }
 
 export async function applyJoin(data: {
@@ -132,6 +155,10 @@ export async function applyJoin(data: {
   pass: 1 | 0;
 }) {
   return request("/guild-member/audit-join-apply", data);
+}
+
+export async function removeMember({ userId }: { userId: number }) {
+  return request(`/guild-member/remove/${userId}`);
 }
 
 export async function applyLeave(data: {
@@ -216,4 +243,106 @@ export async function setMemberRole({ userId, status }: { userId: number; status
 
 export async function getFindStat({ timeType }: { timeType: number }) {
   return request(`/guild/find-stat/${timeType}`);
+}
+
+export async function getTurnoverList(data: {
+  startTime: string;
+  endTime: string;
+}): Promise<API.ResponseModel<{ time: string; value: string }[]>> {
+  return request(`/guild/turnover-list`, data);
+}
+
+export async function getMonthStat(): Promise<
+  API.ResponseModel<{
+    // 成员数量
+    members: number;
+    // 本月新成员数量
+    thisMonthNewMembers: number;
+    // 本月离会成员数量
+    thisMonthLeaveMembers: number;
+    // 活跃房间数量
+    activeRoomCount: number;
+    // 流水列表
+    turnoverList: {
+      // 日期
+      time: string;
+      // 值
+      value: number;
+    }[];
+    //成员日排名
+    memberDailyRankList: {
+      // 用户编码
+      userCode: string;
+      // 用户昵称
+      nickname: string;
+      // 排名
+      rank: number;
+      // 值
+      value: number;
+    }[];
+    // 成员周排名
+    memberWeeklyRankList: {
+      // 用户编码
+      userCode: string;
+      // 用户昵称
+      nickname: string;
+      // 排名
+      rank: number;
+      // 值
+      value: number;
+    }[];
+    // 成员月排名
+    memberMonthlyRankList: {
+      // 用户编码
+      userCode: string;
+      // 用户昵称
+      nickname: string;
+      // 排名
+      rank: number;
+      // 值
+      value: number;
+    }[];
+    // 房间日排名
+    roomDailyRankList: {
+      // 房间编码
+      roomNo: string;
+      // 房间名称
+      roomName: string;
+      rank: number;
+      value: number;
+    }[];
+    roomWeeklyRankList: {
+      // 房间编码
+      roomNo: string;
+      // 房间名称
+      roomName: string;
+      rank: number;
+      value: number;
+    }[];
+    roomMonthlyRankList: {
+      // 房间编码
+      roomNo: string;
+      // 房间名称
+      roomName: string;
+      rank: number;
+      value: number;
+    }[];
+  }>
+> {
+  return request(`/guild/month-stat`);
+}
+
+export async function getStatByTimeRange(data: { startTime: string; endTime: string }): Promise<
+  API.ResponseModel<{
+    // 流水
+    turnover: number;
+    // 有效活跃数
+    upMicMembers: number;
+    // 今日活跃数
+    activeMembers: number;
+    // 有效收益人数
+    incomeMembers: number;
+  }>
+> {
+  return request(`/guild/stat-by-time-range`, data);
 }

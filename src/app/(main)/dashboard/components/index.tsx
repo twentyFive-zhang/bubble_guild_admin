@@ -7,7 +7,7 @@ import { useState } from "react";
 export const RankList = ({
   data,
 }: {
-  data?: {
+  data: {
     todayRoomTurnoverRankList: {
       rank: number;
       roomNo: string;

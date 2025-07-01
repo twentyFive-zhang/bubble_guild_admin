@@ -1,16 +1,24 @@
 "use client";
 
 import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, Flex, Form, Popconfirm, Table } from "antd";
+import { Button, ButtonProps, Flex, Form, FormInstance, Popconfirm, Table } from "antd";
 import { AnyObject } from "antd/es/_util/type";
-import { ColumnsType, GetRowKey } from "antd/es/table/interface";
+import { ColumnsType } from "antd/es/table/interface";
 import { Key, ReactNode, useEffect, useState } from "react";
 
 export function CommonButton() {
   return <Button></Button>;
 }
 
-export function PopoverButton({ title, ajax }: { title: string; ajax: () => Promise<void> }) {
+export function PopoverButton({
+  title,
+  ajax,
+  props,
+}: {
+  props?: ButtonProps;
+  title: string;
+  ajax: () => Promise<void>;
+}) {
   const [loading, setLoading] = useState<boolean>(false);
   const onConfirm = async () => {
     setLoading(true);
@@ -19,7 +27,9 @@ export function PopoverButton({ title, ajax }: { title: string; ajax: () => Prom
   };
   return (
     <Popconfirm title={title} okButtonProps={{ loading }} onConfirm={onConfirm}>
-      <Button type="link">{title}</Button>
+      <Button type="link" {...props}>
+        {title}
+      </Button>
     </Popconfirm>
   );
 }
@@ -32,6 +42,10 @@ export default function CommonTable<D = AnyObject, P = unknown>({
   request,
   columns,
   renderColumns,
+  renderFormRight,
+  renderHeader,
+  initialValues,
+  sortParams,
 }: {
   columns?: ColumnsType<D>;
   formChildren?: ReactNode;
@@ -40,6 +54,13 @@ export default function CommonTable<D = AnyObject, P = unknown>({
   hideRowSelection?: boolean;
   request: (params: API.PageParams<P>) => Promise<API.ResponseModel<API.PageModel<D>>>;
   renderColumns?: (props: { onSearch: () => Promise<void> }) => ColumnsType<D>;
+  renderFormRight?: (props: { onSearch: () => Promise<void>; selectedRows: D[] }) => ReactNode;
+  renderHeader?: (props: {
+    form: FormInstance<P>;
+    onSearch: (params?: { pageNum?: number; pageSize?: number }) => Promise<void>;
+  }) => ReactNode;
+  initialValues?: P;
+  sortParams?: (params: API.PageParams<P>) => API.PageParams<P>;
 }) {
   const [form] = Form.useForm<P>();
   const [dataSource, setDataSource] = useState<D[]>([]);
@@ -60,15 +81,22 @@ export default function CommonTable<D = AnyObject, P = unknown>({
     setLoading(true);
     const searchValues = form.getFieldsValue();
 
-    const res = await request({ ...searchValues, ...pageParams, ...params });
+    const res = await request(
+      sortParams?.({ ...searchValues, ...pageParams, ...params }) || {
+        ...searchValues,
+        ...pageParams,
+        ...params,
+      }
+    );
     if (!res?.data) {
       setLoading(false);
       return;
     }
     const { list, total } = res.data;
-    console.log(res.data);
+    // console.log(res.data);
     setTotal(total);
     setDataSource(list);
+    setSelectedRows([]);
     if (params) setPageParams((pre) => ({ ...pre, ...params }));
     // setPageParams(rest);
     setLoading(false);
@@ -77,60 +105,66 @@ export default function CommonTable<D = AnyObject, P = unknown>({
     onSearch();
   }, []);
   return (
-    <Flex vertical gap={16}>
-      {!isHideForm && (
-        <Form layout="inline" form={form}>
-          {formChildren}
-          <Form.Item>
-            <Flex gap={8}>
-              {/* <Button type="primary">批量通过</Button> */}
-              <Button
-                type="primary"
-                loading={loading}
-                icon={<SearchOutlined></SearchOutlined>}
-                onClick={() => onSearch({ pageNum: 1 })}>
-                查询
-              </Button>
-              <Button
-                icon={<ReloadOutlined />}
-                loading={loading}
-                onClick={() => {
-                  form.resetFields();
-                  onSearch({ pageNum: 1 });
-                }}>
-                重置
-              </Button>
+    <>
+      {renderHeader?.({ onSearch, form })}
+      <Flex vertical gap={16}>
+        {!isHideForm && (
+          <Form layout="inline" form={form} initialValues={initialValues || {}}>
+            <Flex gap={16} wrap>
+              {formChildren}
+              <Form.Item>
+                <Flex gap={8}>
+                  <Button
+                    type="primary"
+                    loading={loading}
+                    icon={<SearchOutlined></SearchOutlined>}
+                    onClick={() => onSearch({ pageNum: 1 })}>
+                    查询
+                  </Button>
+                  <Button
+                    icon={<ReloadOutlined />}
+                    loading={loading}
+                    onClick={() => {
+                      form.resetFields();
+                      onSearch({ pageNum: 1 });
+                    }}>
+                    重置
+                  </Button>
+                  {renderFormRight?.({ onSearch, selectedRows })}
+                </Flex>
+              </Form.Item>
             </Flex>
-          </Form.Item>
-        </Form>
-      )}
-      <Table<D>
-        dataSource={dataSource}
-        bordered
-        rowKey={rowKey}
-        loading={loading}
-        columns={renderColumns?.({ onSearch }) || columns || []}
-        pagination={{
-          showSizeChanger: true,
-          showQuickJumper: true,
-          pageSize: pageParams.pageSize,
-          current: pageParams.pageNum,
-          total,
-          showTotal: (total) => `共 ${total} 条`,
-          onChange(page, pageSize) {
-            onSearch({ pageNum: page, pageSize });
-          },
-        }}
-        {...(hideRowSelection
-          ? {}
-          : {
-              rowSelection: {
-                selectedRowKeys: selectedRows.map((item) => item[rowKey]) as Key[],
-                onChange(selectedRowKeys, selectedRowList, info) {
-                  setSelectedRows(selectedRowList);
+          </Form>
+        )}
+
+        <Table<D>
+          dataSource={dataSource}
+          bordered
+          rowKey={rowKey}
+          loading={loading}
+          columns={renderColumns?.({ onSearch }) || columns || []}
+          pagination={{
+            showSizeChanger: true,
+            showQuickJumper: true,
+            pageSize: pageParams.pageSize,
+            current: pageParams.pageNum,
+            total,
+            showTotal: (total) => `共 ${total} 条`,
+            onChange(page, pageSize) {
+              onSearch({ pageNum: page, pageSize });
+            },
+          }}
+          {...(hideRowSelection
+            ? {}
+            : {
+                rowSelection: {
+                  selectedRowKeys: selectedRows.map((item) => item[rowKey]) as Key[],
+                  onChange(selectedRowKeys, selectedRowList) {
+                    setSelectedRows(selectedRowList);
+                  },
                 },
-              },
-            })}></Table>
-    </Flex>
+              })}></Table>
+      </Flex>
+    </>
   );
 }

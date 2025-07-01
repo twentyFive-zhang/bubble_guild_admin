@@ -1,5 +1,5 @@
-import { Avatar, Card, Flex, Layout, Menu } from "antd";
-import { Header, Footer, Content } from "antd/es/layout/layout";
+import { Avatar, Flex, Layout } from "antd";
+import { Header, Content } from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import Menus from "./components/menus";
 import PageTitle from "./components/pageTitle";

@@ -3,15 +3,20 @@
 import { usePathname } from "next/navigation";
 import { routeMap } from "@/config/routes";
 import { ReactNode } from "react";
-import { Card } from "antd";
+import { Breadcrumb, Card } from "antd";
+import { HomeOutlined } from "@ant-design/icons";
+import Link from "next/link";
 
 export default function PageTitle({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  // console.log(pathname);
+  console.log(routeMap[pathname]);
   return (
-    <>
-      <div className="text-2xl font-bold mb-4">{routeMap[pathname]}</div>
-      {pathname === "/dashboard" ? children : <Card>{children}</Card>}
-    </>
+    <div className="flex flex-col gap-4">
+      <Breadcrumb
+        items={routeMap[pathname].map((item) => ({
+          title: item.children?.length ? item.title : <Link href={item.href}>{item.title}</Link>,
+        }))}></Breadcrumb>
+      {["/dashboard", "/dataManage"].includes(pathname) ? children : <Card>{children}</Card>}
+    </div>
   );
 }
