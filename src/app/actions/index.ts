@@ -8,6 +8,7 @@ async function request(url: string, body?: Record<string, unknown>) {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
   console.log(token);
+  let redirectPath = "";
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API}/guild-admin${url}`, {
       method: "POST",
@@ -24,13 +25,15 @@ async function request(url: string, body?: Record<string, unknown>) {
     // GET(resData);
     if (resData.code === 401) {
       // cookieStore.delete("token");
-      redirect("/sign-in");
+      // redirect("/sign-in");
+      redirectPath = "/sign-in";
       // return resData;
     }
     if (resData.code === 200) {
       if (url === "/login") {
         cookieStore.set("token", resData.data.token);
-        redirect("/");
+        // redirect("/");
+        redirectPath = "/";
       }
       if (url === "logout") {
         cookieStore.delete("token");
@@ -54,6 +57,8 @@ async function request(url: string, body?: Record<string, unknown>) {
   } catch (e) {
     console.log(e);
     return {};
+  } finally {
+    if (redirectPath) redirect(redirectPath);
   }
 }
 
