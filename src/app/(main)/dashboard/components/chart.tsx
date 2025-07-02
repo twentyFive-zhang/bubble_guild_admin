@@ -31,13 +31,19 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function ChartAreaAxes({ list }: { list: { time: string; value: number }[] }) {
+export function ChartAreaAxes({
+  list,
+  description,
+}: {
+  list: { time: string; value: number }[];
+  description?: string;
+}) {
   // console.log(data.lastSevenDaysTurnoverList);
   return (
     <Card className="border-none shadow-none">
       <CardHeader>
         <CardTitle>
-          工会流水<span className="text-xs  font-normal">(近七日)</span>
+          工会流水<span className="text-xs  font-normal">({description || "近七日"})</span>
         </CardTitle>
       </CardHeader>
       <CardContent>

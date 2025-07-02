@@ -22,10 +22,12 @@ async function request(url: string, body?: Record<string, unknown>) {
     });
     const resData = await res.json();
     console.log(resData);
+
+    console.log(url);
     // GET(resData);
     if (resData.code === 401) {
       redirectPath = "/sign-in";
-      // return resData;
+      return { errors: "暂无权限，请重新登录" };
     }
     if (resData.code === 200) {
       if (url === "/login") {
@@ -49,11 +51,12 @@ async function request(url: string, body?: Record<string, unknown>) {
       }
       return resData;
     }
-
-    return resData;
+    return { errors: resData.message };
   } catch (e) {
     console.log(e);
-    return {};
+    return {
+      errors: "服务器出错，请稍候重试",
+    };
   } finally {
     if (redirectPath) redirect(redirectPath);
   }

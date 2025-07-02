@@ -5,6 +5,7 @@ import FormItem from "antd/es/form/FormItem";
 import Timer from "antd/es/statistic/Timer";
 import { useState } from "react";
 import { login, getVerifyCode } from "@/app/actions";
+import { redirect } from "next/navigation";
 
 function CountDownButton({ form }: { form: FormInstance }) {
   const [deadline, setDeadLine] = useState<number>(0);
@@ -47,7 +48,9 @@ export default function LoginForm() {
         setLoading(true);
         login(values)
           .then((res) => {
-            console.log({ res });
+            // console.log({ res });
+            localStorage.setItem("user", JSON.stringify(res.data));
+            redirect("/");
           })
           .finally(() => {
             setLoading(false);

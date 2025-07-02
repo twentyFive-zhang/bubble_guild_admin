@@ -30,7 +30,7 @@ export default async function Page() {
               </div>
             </div>
             <Divider></Divider>
-            <ChartAreaAxes list={data?.turnoverList || []}></ChartAreaAxes>
+            <ChartAreaAxes description="近30日" list={data?.turnoverList || []}></ChartAreaAxes>
           </Card>
         </Col>
         <Col span={8}>

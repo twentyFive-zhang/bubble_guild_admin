@@ -39,39 +39,49 @@ export default function Main() {
         hideRowSelection={activeKey === "2"}
         rowKey={"id"}
         request={getJoinPage}
-        renderColumns={({ onSearch }) => [
-          { title: "用户ID", dataIndex: "id" },
-          { title: "用户编码", dataIndex: "userCode" },
-          { title: "用户昵称", dataIndex: "nickname" },
-          { title: "申请时间", dataIndex: "applyTimeStr" },
-          {
-            title: "操作",
-            dataIndex: "operation",
-            render: (_v, record) => (
-              <Flex gap={8}>
-                <PopoverButton
-                  title="同意"
-                  ajax={async () => {
-                    await applyJoin({
-                      idList: [record.id],
-                      pass: 1,
-                    });
-                    onSearch();
-                  }}></PopoverButton>
+        renderColumns={({ onSearch }) =>
+          activeKey === "2"
+            ? [
+                { title: "用户ID", dataIndex: "id" },
+                { title: "用户编码", dataIndex: "userCode" },
+                { title: "用户昵称", dataIndex: "nickname" },
+                { title: "申请时间", dataIndex: "applyTimeStr" },
+                { title: "审核状态", dataIndex: "auditStatusName" },
+              ]
+            : [
+                { title: "用户ID", dataIndex: "id" },
+                { title: "用户编码", dataIndex: "userCode" },
+                { title: "用户昵称", dataIndex: "nickname" },
+                { title: "申请时间", dataIndex: "applyTimeStr" },
+                {
+                  title: "操作",
+                  dataIndex: "operation",
+                  render: (_v, record) => (
+                    <Flex gap={8}>
+                      <PopoverButton
+                        title="同意"
+                        ajax={async () => {
+                          await applyJoin({
+                            idList: [record.id],
+                            pass: 1,
+                          });
+                          onSearch();
+                        }}></PopoverButton>
 
-                <PopoverButton
-                  title="拒绝"
-                  ajax={async () => {
-                    await applyJoin({
-                      idList: [record.id],
-                      pass: 0,
-                    });
-                    onSearch();
-                  }}></PopoverButton>
-              </Flex>
-            ),
-          },
-        ]}
+                      <PopoverButton
+                        title="拒绝"
+                        ajax={async () => {
+                          await applyJoin({
+                            idList: [record.id],
+                            pass: 0,
+                          });
+                          onSearch();
+                        }}></PopoverButton>
+                    </Flex>
+                  ),
+                },
+              ]
+        }
         formChildren={<Search></Search>}
         renderFormRight={({ selectedRows, onSearch }) =>
           activeKey === "1" && (
