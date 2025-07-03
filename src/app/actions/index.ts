@@ -349,3 +349,141 @@ export async function getStatByTimeRange(data: { startTime: string; endTime: str
 > {
   return request(`/guild/stat-by-time-range`, data);
 }
+
+export async function getRoomList(
+  data: PageParams<{
+    // 6-周 10-月
+    timeType: number;
+    statTime: string;
+  }>
+): Promise<
+  API.ResponseModel<
+    API.PageModel<{
+      // 房间ID：后续调用接口，用这个字段
+      roomId: number;
+      // 房间编码：页面显示用这个字段
+      roomNo: string;
+      // 房间名称
+      roomName: string;
+      // 房间图标
+      roomIcon: string;
+      // 房间类型
+      roomCategoryName: string;
+      // 最后开启时间
+      lastOpenTimeStr: string;
+      // 流水
+      turnover: number;
+      // 直送流水
+      directTurnover: number;
+      // 背包流水
+      packageTurnover: number;
+      // 新用户数量
+      sendGiftNewUserCount: number;
+    }>
+  >
+> {
+  return request("/guild-room/stat-list", data);
+}
+
+export async function getRoomRankList({ roomId }: PageParams<{ roomId?: number }>): Promise<
+  API.ResponseModel<
+    API.PageModel<{
+      // 1-排名
+      rank: number;
+      // 贡献榜用户昵称
+      contributeUser: string;
+      // 贡献榜单值
+      contributeValue: number;
+      // 收益榜用户昵称
+      receiveUser: string;
+      // 用户榜单值
+      receiveValue: number;
+    }>
+  >
+> {
+  return request(`/room-user/rank-list/${roomId}`);
+}
+
+export async function getRoomLogList(
+  data: PageParams<{
+    // 房间ID
+    roomId: number;
+    // 1-开启房间 2-关闭房间 3-更改房间信息 4-抱上麦 5-抱下麦
+    // 6-麦位上锁 7-麦位解锁 8-麦位禁言 9-取消麦位禁言 10-房间内踢人
+    // 11-用户禁言 12-取消用户禁言 13-加入黑名单 15-取消黑名单
+    // 16-房间上锁 17-取消房间上锁
+    operateType: string;
+    // 用户编码
+    operatedUserCode: string;
+    // 开始时间: yyyyMMddHHmmss
+    startTime: string;
+    // 结束时间: yyyyMMddHHmmss
+    endTime: string;
+    pageNum: 1;
+    pageSize: 10;
+  }>
+): Promise<
+  API.ResponseModel<
+    API.PageModel<{
+      // 操作者用户编码
+      operateUserCode: string;
+      // 操作者用户昵称
+      operateNickname: string;
+      // 被操作者用户编码
+      operatedUserCode: string;
+      // 被操作者用户昵称
+      operatedNickname: string;
+      // 操作类型
+      operateTypeName: string;
+      // 操作时间
+      createTimeStr: string;
+    }>
+  >
+> {
+  return request(`/guild-room/operate-record-page`, data);
+}
+
+export async function getRoomHistory({ roomId }: { roomId: number }): Promise<
+  API.ResponseModel<{
+    // 统计时间
+    statTime: string;
+    // 开启天数
+    openedDays: number;
+    // 流水
+    turnover: number;
+    // 直送流水
+    directTurnover: number;
+    // 背包流水
+    packageTurnover: number;
+    // 新用户数量
+    sendGiftNewUserCount: number;
+  }>
+> {
+  return request(`/guild-room/stat-history/${roomId}`);
+}
+
+export async function getRoomDetail(data: {
+  roomId: number;
+  // 6-周 10-月
+  timeType: number;
+  // 周的时候，格式为yyyyMMdd，月的时候格式为yyyyMM
+  statTime: string;
+}): Promise<
+  API.ResponseModel<{
+    // 统计时间
+    // statTime: string;
+    // 开启天数
+    openedDays: number;
+    // 流水
+    turnover: number;
+    // 直送流水
+    directTurnover: number;
+    // 背包流水
+    packageTurnover: number;
+    // 新用户数量
+    sendGiftNewUserCount: number;
+    turnoverList: { time: string; value: number }[];
+  }>
+> {
+  return request(`/guild-room/stat-detail`, data);
+}

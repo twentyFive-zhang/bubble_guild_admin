@@ -9,6 +9,7 @@ import { routeMap } from "@/config/routes";
 export default function Menus() {
   const router = useRouter();
   const pathname = usePathname();
+  console.log(pathname);
   return (
     <Menu
       defaultSelectedKeys={[pathname]}

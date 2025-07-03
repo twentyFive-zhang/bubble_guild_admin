@@ -6,13 +6,17 @@ import Timer from "antd/es/statistic/Timer";
 import { useState } from "react";
 import { login, getVerifyCode } from "@/app/actions";
 import { redirect } from "next/navigation";
+import { useRequestMessage } from "@/hooks";
 
 function CountDownButton({ form }: { form: FormInstance }) {
   const [deadline, setDeadLine] = useState<number>(0);
+  const { checkMessage } = useRequestMessage();
 
   const sendCode = () => {
     form.validateFields(["phone"]).then((values) => {
-      getVerifyCode(values);
+      getVerifyCode(values).then((res) => {
+        checkMessage(res);
+      });
       setDeadLine(Date.now() + 60 * 1000);
     });
   };
@@ -39,6 +43,7 @@ function CountDownButton({ form }: { form: FormInstance }) {
 export default function LoginForm() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
+  const { checkMessage } = useRequestMessage();
   return (
     <Form
       name="login"
@@ -48,9 +53,12 @@ export default function LoginForm() {
         setLoading(true);
         login(values)
           .then((res) => {
-            // console.log({ res });
-            localStorage.setItem("user", JSON.stringify(res.data));
-            redirect("/");
+            // console.log(res);
+            if (checkMessage(res)) {
+              // if(res.errors)
+              localStorage.setItem("user", JSON.stringify(res.data));
+              redirect("/");
+            }
           })
           .finally(() => {
             setLoading(false);

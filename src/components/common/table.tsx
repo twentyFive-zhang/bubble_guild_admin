@@ -46,6 +46,8 @@ export default function CommonTable<D = AnyObject, P = unknown>({
   renderHeader,
   initialValues,
   sortParams,
+  hidePagination,
+  isHideFormButton,
 }: {
   columns?: ColumnsType<D>;
   formChildren?: ReactNode;
@@ -60,6 +62,8 @@ export default function CommonTable<D = AnyObject, P = unknown>({
     onSearch: (params?: { pageNum?: number; pageSize?: number }) => Promise<void>;
   }) => ReactNode;
   initialValues?: P;
+  hidePagination?: boolean;
+  isHideFormButton?: boolean;
   sortParams?: (params: API.PageParams<P>) => API.PageParams<P>;
 }) {
   const [form] = Form.useForm<P>();
@@ -92,8 +96,10 @@ export default function CommonTable<D = AnyObject, P = unknown>({
       setLoading(false);
       return;
     }
-    const { list, total } = res.data;
-    // console.log(res.data);
+    const { list, total } = hidePagination
+      ? { list: res.data as unknown as D[], total: (res.data as unknown as D[])?.length }
+      : res.data;
+
     setTotal(total);
     setDataSource(list);
     setSelectedRows([]);
@@ -104,38 +110,41 @@ export default function CommonTable<D = AnyObject, P = unknown>({
   useEffect(() => {
     onSearch();
   }, []);
+  console.log({ dataSource });
   return (
     <>
       {renderHeader?.({ onSearch, form })}
       <Flex vertical gap={16}>
-        {!isHideForm && (
-          <Form layout="inline" form={form} initialValues={initialValues || {}}>
+        <Form layout="inline" form={form} initialValues={initialValues || {}}>
+          {!isHideForm && (
             <Flex gap={16} wrap>
               {formChildren}
-              <Form.Item>
-                <Flex gap={8}>
-                  <Button
-                    type="primary"
-                    loading={loading}
-                    icon={<SearchOutlined></SearchOutlined>}
-                    onClick={() => onSearch({ pageNum: 1 })}>
-                    查询
-                  </Button>
-                  <Button
-                    icon={<ReloadOutlined />}
-                    loading={loading}
-                    onClick={() => {
-                      form.resetFields();
-                      onSearch({ pageNum: 1 });
-                    }}>
-                    重置
-                  </Button>
-                  {renderFormRight?.({ onSearch, selectedRows })}
-                </Flex>
-              </Form.Item>
+              {!isHideFormButton && (
+                <Form.Item>
+                  <Flex gap={8}>
+                    <Button
+                      type="primary"
+                      loading={loading}
+                      icon={<SearchOutlined></SearchOutlined>}
+                      onClick={() => onSearch({ pageNum: 1 })}>
+                      查询
+                    </Button>
+                    <Button
+                      icon={<ReloadOutlined />}
+                      loading={loading}
+                      onClick={() => {
+                        form.resetFields();
+                        onSearch({ pageNum: 1 });
+                      }}>
+                      重置
+                    </Button>
+                    {renderFormRight?.({ onSearch, selectedRows })}
+                  </Flex>
+                </Form.Item>
+              )}
             </Flex>
-          </Form>
-        )}
+          )}
+        </Form>
 
         <Table<D>
           dataSource={dataSource}
@@ -143,17 +152,21 @@ export default function CommonTable<D = AnyObject, P = unknown>({
           rowKey={rowKey}
           loading={loading}
           columns={renderColumns?.({ onSearch }) || columns || []}
-          pagination={{
-            showSizeChanger: true,
-            showQuickJumper: true,
-            pageSize: pageParams.pageSize,
-            current: pageParams.pageNum,
-            total,
-            showTotal: (total) => `共 ${total} 条`,
-            onChange(page, pageSize) {
-              onSearch({ pageNum: page, pageSize });
-            },
-          }}
+          pagination={
+            hidePagination
+              ? false
+              : {
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                  pageSize: pageParams.pageSize,
+                  current: pageParams.pageNum,
+                  total,
+                  showTotal: (total) => `共 ${total} 条`,
+                  onChange(page, pageSize) {
+                    onSearch({ pageNum: page, pageSize });
+                  },
+                }
+          }
           {...(hideRowSelection
             ? {}
             : {

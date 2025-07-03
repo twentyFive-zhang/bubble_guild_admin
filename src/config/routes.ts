@@ -47,6 +47,8 @@ export const routes = [
       {
         title: "房间信息",
         href: "/roomInfo",
+        hideChildren: true,
+        children: [{ title: "房间详情", href: "/detail" }],
       },
     ],
   },
@@ -77,28 +79,33 @@ export const routes = [
 
 export const routeMap: Record<string, { title: string; href: string; children?: IRoute[] }[]> = {};
 
-const flatRoutesToMenuList = (routes: IRoute[], key?: string, routeList?: IRoute[]): ItemType[] => {
+const flatRoutesToMenuList = (
+  routes: (IRoute & { hideChildren?: boolean })[],
+  key?: string,
+  routeList?: IRoute[]
+): ItemType[] => {
   return routes.map((item) => {
-    const { title, href, children } = item;
-    if (!children?.length) {
+    const { title, href, children, hideChildren } = item;
+    if (!children?.length || hideChildren) {
       routeMap[`${key || ""}${href}`] = [...(routeList || []), item];
     }
+    const childrenData = children?.length
+      ? {
+          children: flatRoutesToMenuList(children, `${key || ""}${href}`, [
+            ...(routeList || []),
+            item,
+          ]),
+        }
+      : {};
     return {
       label: title,
       title,
       key: `${key || ""}${href}`,
-      ...(children?.length
-        ? {
-            children: flatRoutesToMenuList(children, `${key || ""}${href}`, [
-              ...(routeList || []),
-              item,
-            ]),
-          }
-        : {}),
+      ...(hideChildren ? {} : childrenData),
     };
   });
 };
 
 export const menuList = flatRoutesToMenuList(routes);
 
-// console.log(routeMap);
+console.log(routeMap);

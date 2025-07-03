@@ -17,5 +17,5 @@ declare namespace API {
     res: T[];
   };
 
-  type ResponseModel<T = string> = { data: T; code: number; message: string };
+  type ResponseModel<T = string> = { data: T; code: number; message: string; errors?: string };
 }

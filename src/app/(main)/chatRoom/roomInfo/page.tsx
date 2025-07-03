@@ -1,3 +1,8 @@
+import Main from "./components/main";
 export default async function Page() {
-  return <div>房间信息</div>;
+  return (
+    <div>
+      <Main></Main>
+    </div>
+  );
 }

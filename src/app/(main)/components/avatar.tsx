@@ -3,11 +3,14 @@
 import { logout } from "@/app/actions";
 import { Avatar, Button, Flex, Popover } from "antd";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const UserAvatar = () => {
   const router = useRouter();
-  const [userData] = useState(() => JSON.parse(global?.localStorage?.getItem("user") || "{}"));
+  const [userData, setUserData] = useState<Partial<{ nickname: string; headUrl: string }>>({});
+  useEffect(() => {
+    setUserData(() => JSON.parse(global?.localStorage?.getItem("user") || "{}"));
+  }, []);
   return (
     <Popover
       placement="bottomRight"
@@ -22,8 +25,8 @@ export const UserAvatar = () => {
         </Button>
       }>
       <Flex align="center" gap={16} className="cursor-pointer">
-        <div className="text-base">{userData.nickname}</div>
-        <Avatar src={userData.headUrl}></Avatar>
+        <div className="text-base">{userData?.nickname}</div>
+        <Avatar src={userData?.headUrl}></Avatar>
       </Flex>
     </Popover>
   );
