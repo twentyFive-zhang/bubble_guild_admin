@@ -1,5 +1,10 @@
+import { Suspense } from "react";
 import Main from "./components";
 
 export default function Page() {
-  return <Main></Main>;
+  return (
+    <Suspense>
+      <Main></Main>
+    </Suspense>
+  );
 }
