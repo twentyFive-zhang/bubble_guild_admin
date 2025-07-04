@@ -1,6 +1,7 @@
 "use client";
 import { getJoinPage, applyJoin } from "@/app/actions";
 import CommonTable, { PopoverButton } from "@/components/common/table";
+import { useRequestMessage } from "@/hooks";
 import { Flex, Form, Input, Tabs } from "antd";
 import { useState } from "react";
 
@@ -19,6 +20,7 @@ export function Search() {
 
 export default function Main() {
   const [activeKey, setActiveKey] = useState<string>("1");
+  const { checkMessage } = useRequestMessage();
   return (
     <div>
       <CommonTable
@@ -61,21 +63,25 @@ export default function Main() {
                       <PopoverButton
                         title="同意"
                         ajax={async () => {
-                          await applyJoin({
+                          const res = await applyJoin({
                             idList: [record.id],
                             pass: 1,
                           });
-                          onSearch();
+                          if (checkMessage(res, { isShowSuccess: true, operationName: "同意" })) {
+                            onSearch();
+                          }
                         }}></PopoverButton>
 
                       <PopoverButton
                         title="拒绝"
                         ajax={async () => {
-                          await applyJoin({
+                          const res = await applyJoin({
                             idList: [record.id],
                             pass: 0,
                           });
-                          onSearch();
+                          if (checkMessage(res, { isShowSuccess: true, operationName: "拒绝" })) {
+                            onSearch();
+                          }
                         }}></PopoverButton>
                     </Flex>
                   ),
@@ -89,8 +95,14 @@ export default function Main() {
               title="批量通过"
               props={{ type: "primary", disabled: !selectedRows.length }}
               ajax={async () => {
-                await applyJoin({ idList: selectedRows.map((item) => item.id), pass: 1 });
-                onSearch();
+                const res = await applyJoin({
+                  idList: selectedRows.map((item) => item.id),
+                  pass: 1,
+                });
+
+                if (checkMessage(res, { isShowSuccess: true, operationName: "拒绝" })) {
+                  onSearch();
+                }
               }}></PopoverButton>
           )
         }></CommonTable>

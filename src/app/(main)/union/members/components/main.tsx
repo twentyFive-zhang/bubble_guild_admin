@@ -2,6 +2,7 @@
 import { getMemberListPage, setMemberRole } from "@/app/actions";
 import CommonTable, { PopoverButton } from "@/components/common/table";
 import { Form, Input, Select } from "antd";
+import { useRequestMessage } from "@/hooks";
 
 export function Search() {
   return (
@@ -24,6 +25,7 @@ export function Search() {
 }
 
 export default function Main() {
+  const { checkMessage } = useRequestMessage();
   return (
     <div>
       <CommonTable
@@ -40,11 +42,15 @@ export default function Main() {
             render: (_v, record) => (
               <PopoverButton
                 ajax={async () => {
-                  await setMemberRole({
+                  const res = await setMemberRole({
                     userId: record.userId,
                     status: record.userRole === 2 ? 0 : 1,
                   });
-                  onSearch();
+                  // onSearch();
+
+                  if (checkMessage(res, { isShowSuccess: true, operationName: "拒绝" })) {
+                    onSearch();
+                  }
                 }}
                 title={`${record.userRole === 2 ? "解除" : "设为"}管理员`}></PopoverButton>
             ),

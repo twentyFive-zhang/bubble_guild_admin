@@ -138,13 +138,14 @@ export async function getPunishPage(
 ): Promise<
   API.ResponseModel<
     API.PageModel<{
-      id: number;
+      userId: number;
       userCode: string;
       nickname: string;
       joinTimeStr: string;
       reasonContent: string;
       violationsTimes: number;
       punishName: string;
+      punishTimeStr: string;
     }>
   >
 > {
@@ -486,4 +487,36 @@ export async function getRoomDetail(data: {
   }>
 > {
   return request(`/guild-room/stat-detail`, data);
+}
+
+export async function getRoomDetailInfo({ roomId }: { roomId: number }): Promise<
+  API.ResponseModel<{
+    roomId: number;
+    roomNo: string;
+    roomName: string;
+    roomIcon: string;
+  }>
+> {
+  return request(`/guild-room/simple/${roomId}`);
+}
+
+export async function exportMemberList(
+  data: PageParams<{
+    // 开始时间
+    statStartTime: string;
+    // 结束时间
+    statEndTime: string;
+    // 用户编码
+    userCode: string;
+    // 活跃时间start
+    activeStartTime: string;
+    // 活跃时间end
+    activeEndTime: string;
+    // 签约时间start
+    joinStartTime: string;
+    // 签约时间end
+    joinEndTime: string;
+  }>
+): Promise<API.ResponseModel> {
+  return request("/guild-member/export", data);
 }

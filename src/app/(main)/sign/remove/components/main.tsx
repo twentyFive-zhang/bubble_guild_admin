@@ -3,6 +3,7 @@ import { getLeavePage, applyLeave } from "@/app/actions";
 import CommonTable, { PopoverButton } from "@/components/common/table";
 import { Flex, Form, Input, Tabs } from "antd";
 import { useState } from "react";
+import { useRequestMessage } from "@/hooks";
 
 export function Search() {
   return (
@@ -18,6 +19,7 @@ export function Search() {
 }
 
 export default function Main() {
+  const { checkMessage } = useRequestMessage();
   const [activeKey, setActiveKey] = useState<string>("1");
   return (
     <div>
@@ -46,7 +48,7 @@ export default function Main() {
                 { title: "用户编码", dataIndex: "userCode" },
                 { title: "用户昵称", dataIndex: "nickname" },
                 { title: "签约时间", dataIndex: "applyTimeStr" },
-                { title: "产生流水(钻石)", dataIndex: "money" },
+                { title: "产生流水(钻石)", dataIndex: "turnover" },
                 {
                   title: "操作",
                   dataIndex: "operation",
@@ -55,21 +57,28 @@ export default function Main() {
                       <PopoverButton
                         title="同意"
                         ajax={async () => {
-                          await applyLeave({
+                          const res = await applyLeave({
                             idList: [record.id],
                             pass: 1,
                           });
-                          onSearch();
+                          // onSearch();
+                          if (checkMessage(res, { isShowSuccess: true, operationName: "拒绝" })) {
+                            onSearch();
+                          }
                         }}></PopoverButton>
 
                       <PopoverButton
                         title="拒绝"
                         ajax={async () => {
-                          await applyLeave({
+                          const res = await applyLeave({
                             idList: [record.id],
                             pass: 0,
                           });
-                          onSearch();
+                          // onSearch();
+
+                          if (checkMessage(res, { isShowSuccess: true, operationName: "拒绝" })) {
+                            onSearch();
+                          }
                         }}></PopoverButton>
                     </Flex>
                   ),
@@ -91,8 +100,15 @@ export default function Main() {
               title="批量通过"
               props={{ type: "primary", disabled: !selectedRows.length }}
               ajax={async () => {
-                await applyLeave({ idList: selectedRows.map((item) => item.id), pass: 1 });
-                onSearch();
+                const res = await applyLeave({
+                  idList: selectedRows.map((item) => item.id),
+                  pass: 1,
+                });
+                // onSearch();
+
+                if (checkMessage(res, { isShowSuccess: true, operationName: "拒绝" })) {
+                  onSearch();
+                }
               }}></PopoverButton>
           )
         }></CommonTable>
