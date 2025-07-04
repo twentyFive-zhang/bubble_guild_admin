@@ -59,7 +59,7 @@ export default function Main() {
                   ajax={async () => {
                     const res = await removeMember({ userId: record.userId });
                     // onSearch();
-                    if (checkMessage(res, { isShowSuccess: true, operationName: "拒绝" })) {
+                    if (checkMessage(res, { isShowSuccess: true, operationName: "解约" })) {
                       onSearch();
                     }
                   }}></PopoverButton>

@@ -62,7 +62,7 @@ export default function Main() {
                             pass: 1,
                           });
                           // onSearch();
-                          if (checkMessage(res, { isShowSuccess: true, operationName: "拒绝" })) {
+                          if (checkMessage(res, { isShowSuccess: true, operationName: "同意" })) {
                             onSearch();
                           }
                         }}></PopoverButton>
@@ -106,7 +106,7 @@ export default function Main() {
                 });
                 // onSearch();
 
-                if (checkMessage(res, { isShowSuccess: true, operationName: "拒绝" })) {
+                if (checkMessage(res, { isShowSuccess: true, operationName: "批量通过" })) {
                   onSearch();
                 }
               }}></PopoverButton>

@@ -48,7 +48,12 @@ export default function Main() {
                   });
                   // onSearch();
 
-                  if (checkMessage(res, { isShowSuccess: true, operationName: "拒绝" })) {
+                  if (
+                    checkMessage(res, {
+                      isShowSuccess: true,
+                      operationName: `${record.userRole === 2 ? "解除" : "设为"}管理员`,
+                    })
+                  ) {
                     onSearch();
                   }
                 }}
