@@ -103,8 +103,8 @@ export default function Rank() {
                 },
               ]}></Select>
           </Form.Item>
-          <Form.Item name="operatedUserCode" label="用户ID">
-            <Input placeholder="请输入用户ID" allowClear></Input>
+          <Form.Item name="operatedUserCode" label="用户编码">
+            <Input placeholder="请输入用户编码" allowClear></Input>
           </Form.Item>
           <Form.Item name="date" label="时间选择">
             <DatePicker.RangePicker allowClear></DatePicker.RangePicker>
