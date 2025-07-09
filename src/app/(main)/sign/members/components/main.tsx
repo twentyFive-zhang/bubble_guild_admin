@@ -21,8 +21,8 @@ export function Search() {
       <Form.Item name="signDate" label="签约时间">
         <DatePicker.RangePicker></DatePicker.RangePicker>
       </Form.Item>
-      <Form.Item name="userCode" label="用户ID">
-        <Input placeholder="请输入用户ID" allowClear></Input>
+      <Form.Item name="userCode" label="用户编码">
+        <Input placeholder="请输入用户编码" allowClear></Input>
       </Form.Item>
     </>
   );
