@@ -1,17 +1,8 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -25,37 +16,6 @@ import dayjs, { Dayjs } from "dayjs";
 import { useEffect } from "react";
 
 export const description = "An area chart with axes";
-
-const chartData = [
-  {
-    time: "20250615",
-    value: 0,
-  },
-  {
-    time: "20250616",
-    value: 0,
-  },
-  {
-    time: "20250617",
-    value: 20000,
-  },
-  {
-    time: "20250618",
-    value: 0,
-  },
-  {
-    time: "20250619",
-    value: 0,
-  },
-  {
-    time: "20250620",
-    value: 32,
-  },
-  {
-    time: "20250621",
-    value: 0,
-  },
-];
 
 const chartConfig = {
   desktop: {
