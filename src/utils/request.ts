@@ -2,7 +2,7 @@ import axios, { type AxiosRequestConfig } from "axios";
 
 const instance = axios.create({
 	timeout: 1000 * 60,
-	baseURL: "/api/guild-admin",
+	baseURL: `${import.meta.env.VITE_REQUEST_URL}/guild-admin`,
 });
 
 instance.interceptors.request.use((config) => {
